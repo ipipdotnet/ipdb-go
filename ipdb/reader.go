@@ -260,6 +260,10 @@ func (db *Reader) Build() time.Time {
 	return time.Unix(db.meta.Build, 0).In(time.UTC)
 }
 
-func (db *Reader) Languages() map[string]int {
-	return db.meta.Languages
+func (db *Reader) Languages() []string {
+	ls := make([]string, 0, len(db.meta.Languages))
+	for k := range db.meta.Languages {
+		ls = append(ls, k)
+	}
+	return ls
 }
