@@ -3,6 +3,7 @@ package ipdb
 import (
 	"encoding/json"
 	"reflect"
+	"time"
 )
 
 type CityInfo struct {
@@ -99,4 +100,24 @@ func (db *City) FindInfo(addr, language string) (*CityInfo, error) {
 	}
 
 	return info, nil
+}
+
+func (db *City) IsIPv4() bool {
+	return db.reader.IsIPv4Support()
+}
+
+func (db *City) IsIPv6() bool {
+	return db.reader.IsIPv6Support()
+}
+
+func (db *City) Languages() []string {
+	return db.reader.Languages()
+}
+
+func (db *City) Fields() []string {
+	return db.reader.meta.Fields
+}
+
+func (db *City) BuildTime() time.Time {
+	return db.reader.Build()
 }
