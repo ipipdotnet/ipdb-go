@@ -32,6 +32,15 @@ var (
 	ErrDataNotExists = errors.New("data is not exists")
 )
 
+type MetaData struct {
+	Build     int64 			`json:"build"`
+	IPVersion uint16 			`json:"ip_version"`
+	Languages map[string]int 	`json:"languages"`
+	NodeCount int 				`json:"node_count"`
+	TotalSize int				`json:"total_size"`
+	Fields 	  []string 			`json:"fields"`
+}
+
 type Reader struct {
 	fileSize int
 	nodeCount int
@@ -43,7 +52,7 @@ type Reader struct {
 	refType map[string]string
 }
 
-func New(name string) (*Reader, error) {
+func New(name string, obj interface{}) (*Reader, error) {
 	var err error
 	var fileInfo os.FileInfo
 	fileInfo, err = os.Stat(name)
@@ -68,11 +77,14 @@ func New(name string) (*Reader, error) {
 		return nil, ErrFileSize
 	}
 
-	t := reflect.TypeOf(&IPInfo{}).Elem()
-	dm := make(map[string]string, t.NumField())
-	for i := 0; i < t.NumField(); i++ {
-		k := t.Field(i).Tag.Get("json")
-		dm[k] = t.Field(i).Name
+	var dm map[string]string
+	if obj != nil {
+		t := reflect.TypeOf(obj).Elem()
+		dm = make(map[string]string, t.NumField())
+		for i := 0; i < t.NumField(); i++ {
+			k := t.Field(i).Tag.Get("json")
+			dm[k] = t.Field(i).Name
+		}
 	}
 
 	db := &Reader{
@@ -113,36 +125,6 @@ func (db *Reader) FindMap(addr, language string) (map[string]string, error) {
 	info := make(map[string]string, len(db.meta.Fields))
 	for k, v := range data {
 		info[db.meta.Fields[k]] = v
-	}
-
-	return info, nil
-}
-
-func (db *Reader) FindInfo(addr, language string) (*IPInfo, error) {
-
-	data, err := db.FindMap(addr, language)
-	if err != nil {
-		return nil, err
-	}
-
-	info := &IPInfo{}
-
-	for k, v := range data {
-		sv := reflect.ValueOf(info).Elem()
-		sfv := sv.FieldByName(db.refType[k])
-
-		if !sfv.IsValid() {
-			continue
-		}
-		if !sfv.CanSet() {
-			continue
-		}
-
-		sft := sfv.Type()
-		fv := reflect.ValueOf(v)
-		if sft == fv.Type() {
-			sfv.Set(fv)
-		}
 	}
 
 	return info, nil
