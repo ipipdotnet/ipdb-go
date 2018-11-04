@@ -1,1 +1,1 @@
-module ipip.net/ipipdotnet/ipdb-go
+module github.com/ipipdotnet/ipdb-go
