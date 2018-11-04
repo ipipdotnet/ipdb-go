@@ -3,7 +3,7 @@ IPIP.net officially supported IP database ipdb format parsing library
 
 # Installing
 <code>
-    go get github.com/ipipdotnet/ipdb-go/ipdb
+    go get github.com/ipipdotnet/ipdb-go
 </code>
 
 # Example
@@ -12,7 +12,7 @@ IPIP.net officially supported IP database ipdb format parsing library
 package main
 
 import (
-	"github.com/ipipdotnet/ipdb-go/ipdb"
+	"github.com/ipipdotnet/ipdb-go"
 	"fmt"
 	"log"
 )
