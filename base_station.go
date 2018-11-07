@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"reflect"
 	"time"
+	"os"
 )
 
 type BaseStationInfo struct {
@@ -38,6 +39,23 @@ func NewBaseStation(name string) (*BaseStation, error) {
 	return &BaseStation{
 		reader: r,
 	}, nil
+}
+
+func (db *BaseStation) Reload(name string) error {
+
+	_, err := os.Stat(name)
+	if err != nil {
+		return err
+	}
+
+	reader, err := New(name, &BaseStationInfo{})
+	if err != nil {
+		return err
+	}
+
+	db.reader = reader
+
+	return nil
 }
 
 func (db *BaseStation) Find(addr, language string) ([]string, error) {

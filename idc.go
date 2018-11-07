@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"reflect"
 	"time"
+	"os"
 )
 
 type IDCInfo struct {
@@ -38,6 +39,23 @@ func NewIDC(name string) (*IDC, error) {
 	return &IDC{
 		reader: r,
 	}, nil
+}
+
+func (db *IDC) Reload(name string) error {
+
+	_, err := os.Stat(name)
+	if err != nil {
+		return err
+	}
+
+	reader, err := New(name, &IDCInfo{})
+	if err != nil {
+		return err
+	}
+
+	db.reader = reader
+
+	return nil
 }
 
 func (db *IDC) Find(addr, language string) ([]string, error) {

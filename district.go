@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"reflect"
 	"time"
+	"os"
 )
 
 type DistrictInfo struct {
@@ -40,6 +41,23 @@ func NewDistrict(name string) (*District, error) {
 	return &District{
 		reader: r,
 	}, nil
+}
+
+func (db *District) Reload(name string) error {
+
+	_, err := os.Stat(name)
+	if err != nil {
+		return err
+	}
+
+	reader, err := New(name, &DistrictInfo{})
+	if err != nil {
+		return err
+	}
+
+	db.reader = reader
+
+	return nil
 }
 
 func (db *District) Find(addr, language string) ([]string, error) {
