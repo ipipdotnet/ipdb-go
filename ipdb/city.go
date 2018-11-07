@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"reflect"
 	"time"
+	"os"
 )
 
 type CityInfo struct {
@@ -52,6 +53,23 @@ func NewCity(name string) (*City, error) {
 	return &City{
 		reader: r,
 	}, nil
+}
+
+func (db *City) Reload(name string) error {
+
+	_, err := os.Stat(name)
+	if err != nil {
+		return err
+	}
+
+	reader, err := New(name, &CityInfo{})
+	if err != nil {
+		return err
+	}
+
+	db.reader = reader
+
+	return nil
 }
 
 func (db *City) Find(addr, language string) ([]string, error) {
