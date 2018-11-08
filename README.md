@@ -25,6 +25,8 @@ func main() {
 		log.Fatal(err)
 	}
 
+	db.Reload("/path/to/city.ipv4.ipdb") // 更新 ipdb 文件后可调用 Reload 方法重新加载内容
+
 	fmt.Println(db.IsIPv4()) // check database support ip type
 	fmt.Println(db.IsIPv6()) // check database support ip type
 	fmt.Println(db.BuildTime()) // database build time
