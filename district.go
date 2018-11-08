@@ -1,7 +1,6 @@
 package ipdb
 
 import (
-	"encoding/json"
 	"reflect"
 	"time"
 	"os"
@@ -18,22 +17,13 @@ type DistrictInfo struct {
 	Longitude    string `json:"longitude"`
 }
 
-func (info DistrictInfo) ToJson() []byte {
-	all, err := json.Marshal(info)
-	if err == nil {
-		return all
-	}
-
-	return nil
-}
-
 type District struct {
-	reader *Reader
+	reader *reader
 }
 
 func NewDistrict(name string) (*District, error) {
 
-	r, e := New(name, &DistrictInfo{})
+	r, e := newReader(name, &DistrictInfo{})
 	if e != nil {
 		return nil, e
 	}
@@ -50,7 +40,7 @@ func (db *District) Reload(name string) error {
 		return err
 	}
 
-	reader, err := New(name, &DistrictInfo{})
+	reader, err := newReader(name, &DistrictInfo{})
 	if err != nil {
 		return err
 	}

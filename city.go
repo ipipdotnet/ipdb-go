@@ -1,12 +1,12 @@
 package ipdb
 
 import (
-	"encoding/json"
 	"reflect"
 	"time"
 	"os"
 )
 
+// CityInfo is City Database Content
 type CityInfo struct {
 	CountryName	string	`json:"country_name"`
 	RegionName string 	`json:"region_name"`
@@ -30,22 +30,15 @@ type CityInfo struct {
 	Anycast string 			`json:"anycast"`
 }
 
-func (info CityInfo) ToJson() []byte {
-	all, err := json.Marshal(info)
-	if err == nil {
-		return all
-	}
-
-	return nil
-}
-
+// City struct 
 type City struct {
-	reader *Reader
+	reader *reader
 }
 
+// NewCity initialize
 func NewCity(name string) (*City, error) {
 
-	r, e := New(name, &CityInfo{})
+	r, e := newReader(name, &CityInfo{})
 	if e != nil {
 		return nil, e
 	}
@@ -55,6 +48,7 @@ func NewCity(name string) (*City, error) {
 	}, nil
 }
 
+// Reload the database
 func (db *City) Reload(name string) error {
 
 	_, err := os.Stat(name)
@@ -62,7 +56,7 @@ func (db *City) Reload(name string) error {
 		return err
 	}
 
-	reader, err := New(name, &CityInfo{})
+	reader, err := newReader(name, &CityInfo{})
 	if err != nil {
 		return err
 	}
@@ -72,10 +66,12 @@ func (db *City) Reload(name string) error {
 	return nil
 }
 
+// Find query with addr
 func (db *City) Find(addr, language string) ([]string, error) {
 	return db.reader.find1(addr, language)
 }
 
+// FindMap query with addr
 func (db *City) FindMap(addr, language string) (map[string]string, error) {
 
 	data, err := db.reader.find1(addr, language)
@@ -90,6 +86,7 @@ func (db *City) FindMap(addr, language string) (map[string]string, error) {
 	return info, nil
 }
 
+// FindInfo query with addr
 func (db *City) FindInfo(addr, language string) (*CityInfo, error) {
 
 	data, err := db.reader.FindMap(addr, language)
@@ -120,22 +117,27 @@ func (db *City) FindInfo(addr, language string) (*CityInfo, error) {
 	return info, nil
 }
 
+// IsIPv4 whether support ipv4
 func (db *City) IsIPv4() bool {
 	return db.reader.IsIPv4Support()
 }
 
+// IsIPv6 whether support ipv6
 func (db *City) IsIPv6() bool {
 	return db.reader.IsIPv6Support()
 }
 
+// Languages return support languages
 func (db *City) Languages() []string {
 	return db.reader.Languages()
 }
 
+// Fields return support fields
 func (db *City) Fields() []string {
 	return db.reader.meta.Fields
 }
 
+// BuildTime return database build Time
 func (db *City) BuildTime() time.Time {
 	return db.reader.Build()
 }

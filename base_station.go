@@ -1,7 +1,6 @@
 package ipdb
 
 import (
-	"encoding/json"
 	"reflect"
 	"time"
 	"os"
@@ -16,22 +15,13 @@ type BaseStationInfo struct {
 	BaseStation string 	`json:"base_station"`
 }
 
-func (info BaseStationInfo) ToJson() []byte {
-	all, err := json.Marshal(info)
-	if err == nil {
-		return all
-	}
-
-	return nil
-}
-
 type BaseStation struct {
-	reader *Reader
+	reader *reader
 }
 
 func NewBaseStation(name string) (*BaseStation, error) {
 
-	r, e := New(name, &BaseStationInfo{})
+	r, e := newReader(name, &BaseStationInfo{})
 	if e != nil {
 		return nil, e
 	}
@@ -48,7 +38,7 @@ func (db *BaseStation) Reload(name string) error {
 		return err
 	}
 
-	reader, err := New(name, &BaseStationInfo{})
+	reader, err := newReader(name, &BaseStationInfo{})
 	if err != nil {
 		return err
 	}

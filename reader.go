@@ -3,7 +3,7 @@ package ipdb
 import (
 	"os"
 	"encoding/binary"
-	"github.com/pkg/errors"
+	"errors"
 	"encoding/json"
 	"io/ioutil"
 	"net"
@@ -41,7 +41,7 @@ type MetaData struct {
 	Fields 	  []string 			`json:"fields"`
 }
 
-type Reader struct {
+type reader struct {
 	fileSize int
 	nodeCount int
 	v4offset int
@@ -52,7 +52,7 @@ type Reader struct {
 	refType map[string]string
 }
 
-func New(name string, obj interface{}) (*Reader, error) {
+func newReader(name string, obj interface{}) (*reader, error) {
 	var err error
 	var fileInfo os.FileInfo
 	fileInfo, err = os.Stat(name)
@@ -87,7 +87,7 @@ func New(name string, obj interface{}) (*Reader, error) {
 		}
 	}
 
-	db := &Reader{
+	db := &reader{
 		fileSize: fileSize,
 		nodeCount: meta.NodeCount,
 
@@ -112,11 +112,11 @@ func New(name string, obj interface{}) (*Reader, error) {
 	return db, nil
 }
 
-func (db *Reader) Find(addr, language string) ([]string, error) {
+func (db *reader) Find(addr, language string) ([]string, error) {
 	return db.find1(addr, language)
 }
 
-func (db *Reader) FindMap(addr, language string) (map[string]string, error) {
+func (db *reader) FindMap(addr, language string) (map[string]string, error) {
 
 	data, err := db.find1(addr, language)
 	if err != nil {
@@ -130,7 +130,7 @@ func (db *Reader) FindMap(addr, language string) (map[string]string, error) {
 	return info, nil
 }
 
-func (db *Reader) find0(addr string) ([]byte, error) {
+func (db *reader) find0(addr string) ([]byte, error) {
 
 	var err error
 	var node int
@@ -163,7 +163,7 @@ func (db *Reader) find0(addr string) ([]byte, error) {
 	return body, nil
 }
 
-func (db *Reader) find1(addr, language string) ([]string, error) {
+func (db *reader) find1(addr, language string) ([]string, error) {
 
 	off, ok := db.meta.Languages[language]
 	if !ok {
@@ -185,7 +185,7 @@ func (db *Reader) find1(addr, language string) ([]string, error) {
 	return tmp[off:off+len(db.meta.Fields)], nil
 }
 
-func (db *Reader) search(ip net.IP, bitCount int) (int, error) {
+func (db *reader) search(ip net.IP, bitCount int) (int, error) {
 
 	var node int
 
@@ -210,12 +210,12 @@ func (db *Reader) search(ip net.IP, bitCount int) (int, error) {
 	return -1, ErrDataNotExists
 }
 
-func (db *Reader) readNode(node, index int) int {
+func (db *reader) readNode(node, index int) int {
 	off := node * 8 + index * 4
 	return int(binary.BigEndian.Uint32(db.data[off:off+4]))
 }
 
-func (db *Reader) resolve(node int) ([]byte, error) {
+func (db *reader) resolve(node int) ([]byte, error) {
 	resolved := node - db.nodeCount + db.nodeCount * 8
 	if resolved >= db.fileSize {
 		return nil, ErrDatabaseError
@@ -230,19 +230,19 @@ func (db *Reader) resolve(node int) ([]byte, error) {
 	return bytes, nil
 }
 
-func (db *Reader) IsIPv4Support() bool {
+func (db *reader) IsIPv4Support() bool {
 	return (int(db.meta.IPVersion) & IPv4) == IPv4
 }
 
-func (db *Reader) IsIPv6Support() bool {
+func (db *reader) IsIPv6Support() bool {
 	return (int(db.meta.IPVersion) & IPv6) == IPv6
 }
 
-func (db *Reader) Build() time.Time {
+func (db *reader) Build() time.Time {
 	return time.Unix(db.meta.Build, 0).In(time.UTC)
 }
 
-func (db *Reader) Languages() []string {
+func (db *reader) Languages() []string {
 	ls := make([]string, 0, len(db.meta.Languages))
 	for k := range db.meta.Languages {
 		ls = append(ls, k)

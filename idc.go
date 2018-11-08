@@ -1,7 +1,6 @@
 package ipdb
 
 import (
-	"encoding/json"
 	"reflect"
 	"time"
 	"os"
@@ -16,22 +15,13 @@ type IDCInfo struct {
 	IDC string 			`json:"idc"`
 }
 
-func (info IDCInfo) ToJson() []byte {
-	all, err := json.Marshal(info)
-	if err == nil {
-		return all
-	}
-
-	return nil
-}
-
 type IDC struct {
-	reader *Reader
+	reader *reader
 }
 
 func NewIDC(name string) (*IDC, error) {
 
-	r, e := New(name, &IDCInfo{})
+	r, e := newReader(name, &IDCInfo{})
 	if e != nil {
 		return nil, e
 	}
@@ -48,7 +38,7 @@ func (db *IDC) Reload(name string) error {
 		return err
 	}
 
-	reader, err := New(name, &IDCInfo{})
+	reader, err := newReader(name, &IDCInfo{})
 	if err != nil {
 		return err
 	}
