@@ -1,5 +1,7 @@
 # ipdb-go
 [![TravisCI Build Status](https://travis-ci.org/ipipdotnet/ipdb-go.svg?branch=master)](https://travis-ci.org/ipipdotnet/ipdb-go)
+[![IPDB Database API Document](https://godoc.org/github.com/ipipdotnet/ipdb-go?status.svg)](https://godoc.org/github.com/ipipdotnet/ipdb-go)
+
 IPIP.net officially supported IP database ipdb format parsing library
 
 # Installing
