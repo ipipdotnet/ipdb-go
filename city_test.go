@@ -9,7 +9,7 @@ func init() {
 }
 
 func TestNewCity(t *testing.T) {
-	db, err := NewCity("city.free.ipdb")
+	db, err := NewCity("city.ipv4.ipdb")
 	if err != nil {
 		t.Log(err)
 	}
