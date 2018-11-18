@@ -5,11 +5,11 @@ import "testing"
 var db *City
 
 func init() {
-	db, _ = NewCity("c:/work/ipdb/city.free.ipdb")
+	db, _ = NewCity("city.free.ipdb")
 }
 
 func TestNewCity(t *testing.T) {
-	db, err := NewCity("c:/work/ipdb/city.free.ipdb")
+	db, err := NewCity("city.free.ipdb")
 	if err != nil {
 		t.Log(err)
 	}
