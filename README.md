@@ -77,7 +77,6 @@ if err != nil {
 }
 fmt.Println(db.IsIPv4())    // check database support ip type
 fmt.Println(db.IsIPv6())    // check database support ip type
-fmt.Println(db.BuildTime()) // database build time
 fmt.Println(db.Languages()) // database support language
 fmt.Println(db.Fields())    // database support fields
 
@@ -88,13 +87,12 @@ fmt.Println(db.FindInfo("1.12.7.255", "CN"))
 fmt.Println()
 </pre>
 
-## 适用于IPDB格式的基站 IPv4 区县库
+## 适用于IPDB格式的基站 IPv4 库
 <pre>
-	db, err := ipdb.NewBaseStation("/path/to/station_ip.ipdb")
-	if err != nil {
-		log.Fatal(err)
-	}
+db, err := ipdb.NewBaseStation("/path/to/station_ip.ipdb")
+if err != nil {
+	log.Fatal(err)
+}
 
-	fmt.Println(db.FindMap("2001:250:200::", "CN"))
-	fmt.Println(db.FindMap("223.220.223.255", "CN"))
+fmt.Println(db.FindMap("223.220.223.255", "CN"))
 </pre>
