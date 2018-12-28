@@ -67,6 +67,9 @@ func newReader(name string, obj interface{}) (*reader, error) {
 	}
 	var meta MetaData
 	metaLength := int(binary.BigEndian.Uint32(body[0:4]))
+	if fileSize <= 4+metaLength {
+		return nil,ErrMetaData
+	}
 	if err := json.Unmarshal(body[4:4+metaLength], &meta); err != nil {
 		return nil, err
 	}
