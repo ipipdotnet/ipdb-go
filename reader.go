@@ -1,16 +1,16 @@
 package ipdb
 
 import (
-	"os"
 	"encoding/binary"
-	"errors"
 	"encoding/json"
+	"errors"
 	"io/ioutil"
 	"net"
-	"strings"
+	"os"
 	"reflect"
-	"unsafe"
+	"strings"
 	"time"
+	"unsafe"
 )
 
 const IPv4 = 0x01
@@ -26,25 +26,25 @@ var (
 	ErrIPFormat = errors.New("Query IP Format error.")
 
 	ErrNoSupportLanguage = errors.New("language not support")
-	ErrNoSupportIPv4 = errors.New("IPv4 not support")
-	ErrNoSupportIPv6 = errors.New("IPv6 not support")
+	ErrNoSupportIPv4     = errors.New("IPv4 not support")
+	ErrNoSupportIPv6     = errors.New("IPv6 not support")
 
 	ErrDataNotExists = errors.New("data is not exists")
 )
 
 type MetaData struct {
-	Build     int64 			`json:"build"`
-	IPVersion uint16 			`json:"ip_version"`
-	Languages map[string]int 	`json:"languages"`
-	NodeCount int 				`json:"node_count"`
-	TotalSize int				`json:"total_size"`
-	Fields 	  []string 			`json:"fields"`
+	Build     int64          `json:"build"`
+	IPVersion uint16         `json:"ip_version"`
+	Languages map[string]int `json:"languages"`
+	NodeCount int            `json:"node_count"`
+	TotalSize int            `json:"total_size"`
+	Fields    []string       `json:"fields"`
 }
 
 type reader struct {
-	fileSize int
+	fileSize  int
 	nodeCount int
-	v4offset int
+	v4offset  int
 
 	meta MetaData
 	data []byte
@@ -60,20 +60,25 @@ func newReader(name string, obj interface{}) (*reader, error) {
 		return nil, err
 	}
 	fileSize := int(fileInfo.Size())
-
+	if fileSize < 4 {
+		return nil, ErrFileSize
+	}
 	body, err := ioutil.ReadFile(name)
 	if err != nil {
 		return nil, ErrReadFull
 	}
 	var meta MetaData
 	metaLength := int(binary.BigEndian.Uint32(body[0:4]))
+	if fileSize < (4 + metaLength) {
+		return nil, ErrFileSize
+	}
 	if err := json.Unmarshal(body[4:4+metaLength], &meta); err != nil {
 		return nil, err
 	}
 	if len(meta.Languages) == 0 || len(meta.Fields) == 0 {
 		return nil, ErrMetaData
 	}
-	if fileSize != (4+metaLength+meta.TotalSize) {
+	if fileSize != (4 + metaLength + meta.TotalSize) {
 		return nil, ErrFileSize
 	}
 
@@ -88,10 +93,10 @@ func newReader(name string, obj interface{}) (*reader, error) {
 	}
 
 	db := &reader{
-		fileSize: fileSize,
+		fileSize:  fileSize,
 		nodeCount: meta.NodeCount,
 
-		meta:meta,
+		meta:    meta,
 		refType: dm,
 
 		data: body[4+metaLength:],
@@ -182,7 +187,7 @@ func (db *reader) find1(addr, language string) ([]string, error) {
 		return nil, ErrDatabaseError
 	}
 
-	return tmp[off:off+len(db.meta.Fields)], nil
+	return tmp[off : off+len(db.meta.Fields)], nil
 }
 
 func (db *reader) search(ip net.IP, bitCount int) (int, error) {
@@ -192,7 +197,7 @@ func (db *reader) search(ip net.IP, bitCount int) (int, error) {
 	if bitCount == 32 {
 		node = db.v4offset
 	} else {
-		node = 0;
+		node = 0
 	}
 
 	for i := 0; i < bitCount; i++ {
@@ -200,7 +205,7 @@ func (db *reader) search(ip net.IP, bitCount int) (int, error) {
 			break
 		}
 
-		node = db.readNode(node, ((0xFF & int(ip[i >> 3])) >> uint(7 - (i % 8))) & 1)
+		node = db.readNode(node, ((0xFF&int(ip[i>>3]))>>uint(7-(i%8)))&1)
 	}
 
 	if node > db.nodeCount {
@@ -211,21 +216,21 @@ func (db *reader) search(ip net.IP, bitCount int) (int, error) {
 }
 
 func (db *reader) readNode(node, index int) int {
-	off := node * 8 + index * 4
-	return int(binary.BigEndian.Uint32(db.data[off:off+4]))
+	off := node*8 + index*4
+	return int(binary.BigEndian.Uint32(db.data[off : off+4]))
 }
 
 func (db *reader) resolve(node int) ([]byte, error) {
-	resolved := node - db.nodeCount + db.nodeCount * 8
+	resolved := node - db.nodeCount + db.nodeCount*8
 	if resolved >= db.fileSize {
 		return nil, ErrDatabaseError
 	}
 
-	size := int(binary.BigEndian.Uint16(db.data[resolved:resolved+2]))
-	if (resolved+2+size) > len(db.data) {
+	size := int(binary.BigEndian.Uint16(db.data[resolved : resolved+2]))
+	if (resolved + 2 + size) > len(db.data) {
 		return nil, ErrDatabaseError
 	}
-	bytes := db.data[resolved+2:resolved+2+size]
+	bytes := db.data[resolved+2 : resolved+2+size]
 
 	return bytes, nil
 }
