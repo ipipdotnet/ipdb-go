@@ -1,9 +1,9 @@
 package ipdb
 
 import (
+	"os"
 	"reflect"
 	"time"
-	"os"
 )
 
 type IDCInfo struct {
@@ -29,6 +29,15 @@ func NewIDC(name string) (*IDC, error) {
 	return &IDC{
 		reader: r,
 	}, nil
+}
+
+func NewIDCInMemory(data []byte) (*IDC, error) {
+	r, e := newReaderInMemory(data, len(data), &IDCInfo{})
+	if e != nil {
+		return nil, e
+	}
+
+	return &IDC{reader: r}, nil
 }
 
 func (db *IDC) Reload(name string) error {

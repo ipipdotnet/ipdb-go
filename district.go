@@ -1,9 +1,9 @@
 package ipdb
 
 import (
+	"os"
 	"reflect"
 	"time"
-	"os"
 )
 
 type DistrictInfo struct {
@@ -31,6 +31,15 @@ func NewDistrict(name string) (*District, error) {
 	return &District{
 		reader: r,
 	}, nil
+}
+
+func NewDistrictInMemory(data []byte) (*District, error) {
+	r, e := newReaderInMemory(data, len(data), &DistrictInfo{})
+	if e != nil {
+		return nil, e
+	}
+
+	return &District{reader: r}, nil
 }
 
 func (db *District) Reload(name string) error {

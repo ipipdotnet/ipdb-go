@@ -1,9 +1,9 @@
 package ipdb
 
 import (
+	"os"
 	"reflect"
 	"time"
-	"os"
 )
 
 // CityInfo is City Database Content
@@ -35,7 +35,7 @@ type City struct {
 	reader *reader
 }
 
-// NewCity initialize
+// NewCity initialize from data in file system
 func NewCity(name string) (*City, error) {
 
 	r, e := newReader(name, &CityInfo{})
@@ -46,6 +46,16 @@ func NewCity(name string) (*City, error) {
 	return &City{
 		reader: r,
 	}, nil
+}
+
+// NewCityInMemory initialize from data in memory
+func NewCityInMemory(data []byte) (*City, error) {
+	r, e := newReaderInMemory(data, len(data), &CityInfo{})
+	if e != nil {
+		return nil, e
+	}
+
+	return &City{reader: r}, nil
 }
 
 // Reload the database

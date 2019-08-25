@@ -1,9 +1,9 @@
 package ipdb
 
 import (
+	"os"
 	"reflect"
 	"time"
-	"os"
 )
 
 type BaseStationInfo struct {
@@ -29,6 +29,15 @@ func NewBaseStation(name string) (*BaseStation, error) {
 	return &BaseStation{
 		reader: r,
 	}, nil
+}
+
+func NewBaseStationInMemory(data []byte) (*BaseStation, error) {
+	r, e := newReaderInMemory(data, len(data), &BaseStationInfo{})
+	if e != nil {
+		return nil, e
+	}
+
+	return &BaseStation{reader: r}, nil
 }
 
 func (db *BaseStation) Reload(name string) error {
