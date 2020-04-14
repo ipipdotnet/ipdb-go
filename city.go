@@ -32,8 +32,7 @@ type CityInfo struct {
 
 	Line string `json:"line"`
 
-	DistrictName string `json:"district_name"`
-	Radius string `json:"radius"`
+	DistrictInfo DistrictInfo `json:"district_info"`
 
 	Route string `json:"route"`
 	ASN string `json:"asn"`
@@ -117,6 +116,9 @@ func (db *City) FindInfo(addr, language string) (*CityInfo, error) {
 	var asnInfoList []ASNInfo
 	var asnInfoType = reflect.TypeOf(asnInfoList)
 
+	var districtInfo DistrictInfo
+	var districtInfoType = reflect.TypeOf(districtInfo)
+
 	info := &CityInfo{}
 
 	for k, v := range data {
@@ -138,6 +140,11 @@ func (db *City) FindInfo(addr, language string) (*CityInfo, error) {
 			err = json.Unmarshal([]byte(v), &asnInfoList)
 			if err == nil {
 				sfv.Set(reflect.ValueOf(asnInfoList))
+			}
+		} else if sft == districtInfoType {
+			err = json.Unmarshal([]byte(v), &districtInfo)
+			if err == nil {
+				sfv.Set(reflect.ValueOf(districtInfo))
 			}
 		}
 	}

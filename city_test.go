@@ -47,8 +47,7 @@ func TestNewCity(t *testing.T) {
 	} else {
 		t.Log(info.Route)
 		t.Log(info.ASN)
-		t.Log(info.DistrictName)
-		t.Log(info.Radius)
+		t.Log(info.DistrictInfo)
 		t.Log(info.ASNInfo)
 
 		for _, af := range info.ASNInfo {
