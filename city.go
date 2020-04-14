@@ -1,9 +1,10 @@
 package ipdb
 
 import (
+	"encoding/json"
+	"os"
 	"reflect"
 	"time"
-	"os"
 )
 
 // CityInfo is City Database Content
@@ -28,6 +29,25 @@ type CityInfo struct {
 	CurrencyCode string 	`json:"currency_code"`
 	CurrencyName string 	`json:"currency_name"`
 	Anycast string 			`json:"anycast"`
+
+	Line string `json:"line"`
+
+	DistrictName string `json:"district_name"`
+	Radius string `json:"radius"`
+
+	Route string `json:"route"`
+	ASN string `json:"asn"`
+	ASNInfo []ASNInfo `json:"asn_info"`
+}
+
+type ASNInfo struct {
+	ASN int `json:"asn"`
+	Registry string `json:"reg"`
+	Country string `json:"cc"`
+	Net string `json:"net"`
+	Org string `json:"org"`
+	Type string `json:"type"`
+	Domain string `json:"domain"`
 }
 
 // City struct 
@@ -94,6 +114,9 @@ func (db *City) FindInfo(addr, language string) (*CityInfo, error) {
 		return nil, err
 	}
 
+	var asnInfoList []ASNInfo
+	var asnInfoType = reflect.TypeOf(asnInfoList)
+
 	info := &CityInfo{}
 
 	for k, v := range data {
@@ -111,6 +134,11 @@ func (db *City) FindInfo(addr, language string) (*CityInfo, error) {
 		fv := reflect.ValueOf(v)
 		if sft == fv.Type() {
 			sfv.Set(fv)
+		} else if sft == asnInfoType {
+			err = json.Unmarshal([]byte(v), &asnInfoList)
+			if err == nil {
+				sfv.Set(reflect.ValueOf(asnInfoList))
+			}
 		}
 	}
 
