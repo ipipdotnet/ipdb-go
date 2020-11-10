@@ -39,6 +39,8 @@ type CityInfo struct {
 	ASNInfo []ASNInfo `json:"asn_info"`
 
 	AreaCode string `json:"area_code"`
+
+	UsageType string `json:"usage_type"`
 }
 
 type ASNInfo struct {
