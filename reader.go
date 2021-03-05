@@ -67,12 +67,18 @@ func newReader(name string, obj interface{}) (*reader, error) {
 	if err != nil {
 		return nil, ErrReadFull
 	}
+	return newReaderWithData(body, obj)
+}
+
+func newReaderWithData(data []byte, obj interface{}) (*reader, error) {
+
+	fileSize := len(data)
 	var meta MetaData
-	metaLength := int(binary.BigEndian.Uint32(body[0:4]))
+	metaLength := int(binary.BigEndian.Uint32(data[0:4]))
 	if fileSize < (4 + metaLength) {
 		return nil, ErrFileSize
 	}
-	if err := json.Unmarshal(body[4:4+metaLength], &meta); err != nil {
+	if err := json.Unmarshal(data[4:4+metaLength], &meta); err != nil {
 		return nil, err
 	}
 	if len(meta.Languages) == 0 || len(meta.Fields) == 0 {
@@ -99,7 +105,7 @@ func newReader(name string, obj interface{}) (*reader, error) {
 		meta:    meta,
 		refType: dm,
 
-		data: body[4+metaLength:],
+		data: data[4+metaLength:],
 	}
 
 	if db.v4offset == 0 {
