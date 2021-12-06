@@ -12,6 +12,7 @@ type CityInfo struct {
 	CountryName	string	`json:"country_name"`
 	RegionName string 	`json:"region_name"`
 	CityName string 	`json:"city_name"`
+	DistrictName string     `json:"district_name"`
 	OwnerDomain string 	`json:"owner_domain"`
 	IspDomain string 	`json:"isp_domain"`
 	Latitude     string `json:"latitude"`
