@@ -1,18 +1,18 @@
 package ipdb
 
 import (
+	"os"
 	"reflect"
 	"time"
-	"os"
 )
 
 type BaseStationInfo struct {
-	CountryName	string	`json:"country_name"`
-	RegionName string 	`json:"region_name"`
-	CityName string 	`json:"city_name"`
-	OwnerDomain string 	`json:"owner_domain"`
-	IspDomain string 	`json:"isp_domain"`
-	BaseStation string 	`json:"base_station"`
+	CountryName string `json:"country_name"`
+	RegionName  string `json:"region_name"`
+	CityName    string `json:"city_name"`
+	OwnerDomain string `json:"owner_domain"`
+	IspDomain   string `json:"isp_domain"`
+	BaseStation string `json:"base_station"`
 }
 
 type BaseStation struct {

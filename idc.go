@@ -1,18 +1,18 @@
 package ipdb
 
 import (
+	"os"
 	"reflect"
 	"time"
-	"os"
 )
 
 type IDCInfo struct {
-	CountryName	string	`json:"country_name"`
-	RegionName string 	`json:"region_name"`
-	CityName string 	`json:"city_name"`
-	OwnerDomain string 	`json:"owner_domain"`
-	IspDomain string 	`json:"isp_domain"`
-	IDC string 			`json:"idc"`
+	CountryName string `json:"country_name"`
+	RegionName  string `json:"region_name"`
+	CityName    string `json:"city_name"`
+	OwnerDomain string `json:"owner_domain"`
+	IspDomain   string `json:"isp_domain"`
+	IDC         string `json:"idc"`
 }
 
 type IDC struct {
