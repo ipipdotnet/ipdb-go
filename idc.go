@@ -1,6 +1,7 @@
 package ipdb
 
 import (
+	"io"
 	"os"
 	"reflect"
 	"time"
@@ -20,8 +21,17 @@ type IDC struct {
 }
 
 func NewIDC(name string) (*IDC, error) {
-
 	r, e := newReader(name, &IDCInfo{})
+	if e != nil {
+		return nil, e
+	}
+
+	return &IDC{
+		reader: r,
+	}, nil
+}
+func NewIDCFromReader(reader io.Reader) (*IDC, error) {
+	r, e := newReaderFromReader(reader, &IDCInfo{})
 	if e != nil {
 		return nil, e
 	}

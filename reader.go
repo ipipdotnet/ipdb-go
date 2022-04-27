@@ -4,7 +4,7 @@ import (
 	"encoding/binary"
 	"encoding/json"
 	"errors"
-	"io/ioutil"
+	"io"
 	"net"
 	"os"
 	"reflect"
@@ -52,24 +52,15 @@ type reader struct {
 	refType map[string]string
 }
 
-func newReader(name string, obj interface{}) (*reader, error) {
-	var err error
-	var fileInfo os.FileInfo
-	fileInfo, err = os.Stat(name)
-	if err != nil {
-		return nil, err
-	}
-	fileSize := int(fileInfo.Size())
-	if fileSize < 4 {
-		return nil, ErrFileSize
-	}
-	body, err := ioutil.ReadFile(name)
+func newReaderFromReader(r io.Reader, obj interface{}) (*reader, error) {
+	body, err := io.ReadAll(r)
 	if err != nil {
 		return nil, ErrReadFull
 	}
+	size := len(body)
 	var meta MetaData
 	metaLength := int(binary.BigEndian.Uint32(body[0:4]))
-	if fileSize < (4 + metaLength) {
+	if size < (4 + metaLength) {
 		return nil, ErrFileSize
 	}
 	if err := json.Unmarshal(body[4:4+metaLength], &meta); err != nil {
@@ -78,7 +69,7 @@ func newReader(name string, obj interface{}) (*reader, error) {
 	if len(meta.Languages) == 0 || len(meta.Fields) == 0 {
 		return nil, ErrMetaData
 	}
-	if fileSize != (4 + metaLength + meta.TotalSize) {
+	if size != (4 + metaLength + meta.TotalSize) {
 		return nil, ErrFileSize
 	}
 
@@ -93,7 +84,7 @@ func newReader(name string, obj interface{}) (*reader, error) {
 	}
 
 	db := &reader{
-		fileSize:  fileSize,
+		fileSize:  size,
 		nodeCount: meta.NodeCount,
 
 		meta:    meta,
@@ -115,6 +106,24 @@ func newReader(name string, obj interface{}) (*reader, error) {
 	}
 
 	return db, nil
+}
+
+func newReader(name string, obj interface{}) (*reader, error) {
+	var err error
+	var fileInfo os.FileInfo
+	fileInfo, err = os.Stat(name)
+	if err != nil {
+		return nil, err
+	}
+	fileSize := int(fileInfo.Size())
+	if fileSize < 4 {
+		return nil, ErrFileSize
+	}
+	file, err := os.Open(name)
+	if err != nil {
+		return nil, err
+	}
+	return newReaderFromReader(file, obj)
 }
 
 func (db *reader) Find(addr, language string) ([]string, error) {

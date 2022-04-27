@@ -1,6 +1,7 @@
 package ipdb
 
 import (
+	"io"
 	"os"
 	"reflect"
 	"time"
@@ -22,8 +23,17 @@ type District struct {
 }
 
 func NewDistrict(name string) (*District, error) {
-
 	r, e := newReader(name, &DistrictInfo{})
+	if e != nil {
+		return nil, e
+	}
+
+	return &District{
+		reader: r,
+	}, nil
+}
+func NewDistrictFromReader(reader io.Reader) (*District, error) {
+	r, e := newReaderFromReader(reader, &DistrictInfo{})
 	if e != nil {
 		return nil, e
 	}

@@ -1,6 +1,7 @@
 package ipdb
 
 import (
+	"io"
 	"os"
 	"reflect"
 	"time"
@@ -20,8 +21,17 @@ type BaseStation struct {
 }
 
 func NewBaseStation(name string) (*BaseStation, error) {
-
 	r, e := newReader(name, &BaseStationInfo{})
+	if e != nil {
+		return nil, e
+	}
+
+	return &BaseStation{
+		reader: r,
+	}, nil
+}
+func NewBaseStationFromReader(reader io.Reader) (*BaseStation, error) {
+	r, e := newReaderFromReader(reader, &BaseStationInfo{})
 	if e != nil {
 		return nil, e
 	}

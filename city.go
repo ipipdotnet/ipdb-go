@@ -2,6 +2,7 @@ package ipdb
 
 import (
 	"encoding/json"
+	"io"
 	"os"
 	"reflect"
 	"time"
@@ -61,8 +62,17 @@ type City struct {
 
 // NewCity initialize
 func NewCity(name string) (*City, error) {
-
 	r, e := newReader(name, &CityInfo{})
+	if e != nil {
+		return nil, e
+	}
+
+	return &City{
+		reader: r,
+	}, nil
+}
+func NewCityFromReader(reader io.Reader) (*City, error) {
+	r, e := newReaderFromReader(reader, &CityInfo{})
 	if e != nil {
 		return nil, e
 	}
