@@ -67,6 +67,18 @@ func newReader(name string, obj interface{}) (*reader, error) {
 	if err != nil {
 		return nil, ErrReadFull
 	}
+
+	return initBytes(body, fileSize, obj)
+}
+
+func newReaderFromBytes(body []byte, obj interface{}) (*reader, error) {
+	if len(body) < 4 {
+		return nil, ErrFileSize
+	}
+	return initBytes(body, len(body), obj)
+}
+
+func initBytes(body []byte, fileSize int, obj interface{}) (*reader, error) {
 	var meta MetaData
 	metaLength := int(binary.BigEndian.Uint32(body[0:4]))
 	if fileSize < (4 + metaLength) {

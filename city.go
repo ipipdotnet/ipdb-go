@@ -74,6 +74,15 @@ func NewCity(name string) (*City, error) {
 	}, nil
 }
 
+func NewCityFromBytes(bs []byte) (*City, error) {
+	r, e := newReaderFromBytes(bs, &CityInfo{})
+	if e != nil {
+		return nil, e
+	}
+
+	return &City{reader: r}, nil
+}
+
 // Reload the database
 func (db *City) Reload(name string) error {
 
