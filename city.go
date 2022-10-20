@@ -21,6 +21,7 @@ type CityInfo struct {
 	UtcOffset string 	`json:"utc_offset"`
 	ChinaRegionCode string `json:"china_region_code"`
 	ChinaCityCode string `json:"china_city_code"`
+	ChinaDistrictCode string `json:"china_district_code"`
 	ChinaAdminCode string	`json:"china_admin_code"`
 	IddCode string 			`json:"idd_code"`
 	CountryCode string 		`json:"country_code"`
